@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生活/旅遊記錄 — 收藏日常的每一份溫度</title>
+    <!-- 載入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 載入 Google Fonts：Noto Serif TC (襯線標題) 與 Noto Sans TC (無襯線內文) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@500;700&display=swap" rel="stylesheet">
+    <!-- 載入 Font Awesome 圖示庫 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind 自訂色彩與字體配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        earth: {
+                            bg: '#FAF7F2',       // 米白背景
+                            oat: '#F3EDE4',      // 燕麥色卡片/區塊
+                            terracotta: '#A67B5B', // 陶土棕主色
+                            terracottaDark: '#8C6345', // 深陶土棕 hover
+                            brown: '#3E3229',    // 深咖啡色主要文字
+                            muted: '#7A6B5D',    // 柔和淺棕次要文字
+                            sage: '#7D8C75',     // 鼠尾草綠輔助色
+                            border: '#E5DDD0'    // 溫暖邊框線
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Noto Serif TC"', 'serif'],
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-earth-bg text-earth-brown font-sans antialiased selection:bg-earth-terracotta selection:text-white">
+
+    <!-- ==================== 1. 頂部導覽列 (Navbar) ==================== -->
+    <header class="sticky top-0 z-40 bg-earth-bg/90 backdrop-blur-md border-b border-earth-border">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16 md:h-20">
+                <!-- 網站標題 Logo -->
+                <a href="#home" class="flex items-center space-x-2.5 group">
+                    <span class="w-8 h-8 rounded-full bg-earth-terracotta text-white flex items-center justify-center text-sm transition-transform group-hover:scale-105">
+                        <i class="fa-solid fa-compass"></i>
+                    </span>
+                    <span class="font-serif text-xl md:text-2xl font-bold tracking-wide text-earth-brown">
+                        生活/旅遊記錄
+                    </span>
+                </a>
+
+                <!-- 電腦版導覽連結 -->
+                <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-earth-muted">
+                    <a href="#home" class="hover:text-earth-terracotta transition-colors py-2">首頁</a>
+                    <a href="#journal" onclick="filterPosts('旅遊足跡')" class="hover:text-earth-terracotta transition-colors py-2">旅途足跡</a>
+                    <a href="#journal" onclick="filterPosts('生活日常')" class="hover:text-earth-terracotta transition-colors py-2">日常隨筆</a>
+                    <a href="#about" class="hover:text-earth-terracotta transition-colors py-2">關於我</a>
+                    <button onclick="openEditorModal()" class="ml-2 px-4 py-2 rounded-full bg-earth-oat text-earth-terracotta hover:bg-earth-terracotta hover:text-white transition-all text-xs font-semibold border border-earth-border">
+                        <i class="fa-solid fa-pen-nib mr-1.5"></i>新增日誌預覽
+                    </button>
+                </nav>
+
+                <!-- 手機版選單按鈕 -->
+                <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg text-earth-brown hover:bg-earth-oat focus:outline-none" aria-label="開啟選單">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 手機版下拉選單 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-earth-bg border-b border-earth-border px-4 pt-2 pb-5 space-y-2 shadow-sm">
+            <a href="#home" class="mobile-link block px-3 py-2.5 rounded-lg text-base font-medium text-earth-brown hover:bg-earth-oat">首頁</a>
+            <a href="#journal" onclick="filterPosts('旅遊足跡')" class="mobile-link block px-3 py-2.5 rounded-lg text-base font-medium text-earth-brown hover:bg-earth-oat">旅途足跡</a>
+            <a href="#journal" onclick="filterPosts('生活日常')" class="mobile-link block px-3 py-2.5 rounded-lg text-base font-medium text-earth-brown hover:bg-earth-oat">日常隨筆</a>
+            <a href="#about" class="mobile-link block px-3 py-2.5 rounded-lg text-base font-medium text-earth-brown hover:bg-earth-oat">關於我</a>
+            <button onclick="openEditorModal()" class="w-full mt-2 px-4 py-2.5 rounded-lg bg-earth-terracotta text-white text-sm font-medium text-center">
+                <i class="fa-solid fa-pen-nib mr-1.5"></i>新增日誌預覽
+            </button>
+        </div>
+    </header>
+
+    <!-- ==================== 2. 主視覺區塊 (Hero Section) ==================== -->
+    <section id="home" class="pt-10 pb-16 md:py-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+            <!-- 左側文字區 -->
+            <div class="lg:col-span-6 space-y-6 text-center lg:text-left">
+                <div class="inline-flex items-center px-3.5 py-1.5 rounded-full bg-earth-oat border border-earth-border text-earth-terracotta text-xs font-medium tracking-wider">
+                    <i class="fa-solid fa-leaf mr-2 text-earth-sage"></i> JOURNAL & TRAVEL LOG
+                </div>
+                <h1 class="font-serif text-4xl sm:text-5xl lg:text-[3.25rem] font-bold leading-tight text-earth-brown">
+                    生活/旅遊記錄
+                </h1>
+                <p class="text-lg sm:text-xl text-earth-muted leading-relaxed font-light max-w-xl mx-auto lg:mx-0">
+                    用雙腳丈量風景，用文字收藏日常的每一份溫度。在這裡記錄山海之間的喘息，與城市角落裡的靜謐時光。
+                </p>
+                <div class="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                    <a href="#journal" class="w-full sm:w-auto px-7 py-3.5 rounded-full bg-earth-terracotta hover:bg-earth-terracottaDark text-white font-medium transition-all shadow-sm hover:shadow flex items-center justify-center">
+                        <span>瀏覽最新記錄</span>
+                        <i class="fa-solid fa-arrow-down ml-2 text-sm"></i>
+                    </a>
+                    <a href="#about" class="w-full sm:w-auto px-7 py-3.5 rounded-full bg-white hover:bg-earth-oat text-earth-brown border border-earth-border font-medium transition-all flex items-center justify-center">
+                        <span>認識站長</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 右側主視覺風景卡片 -->
+            <div class="lg:col-span-6">
+                <div class="relative bg-white p-3 sm:p-4 rounded-3xl shadow-md border border-earth-border">
+                    <div class="overflow-hidden rounded-2xl aspect-[4/3] bg-earth-oat">
+                        <img 
+                            src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80" 
+                            onerror="this.onerror=null;this.src='https://placehold.co/800x600/F3EDE4/A67B5B?text=Mountain+Valley+Morning';" 
+                            alt="晨光灑落山谷與湖泊的自然風景" 
+                            class="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                        >
+                    </div>
+                    <!-- 卡片底部圖說標籤 -->
+                    <div class="mt-3 px-2 flex items-center justify-between text-xs sm:text-sm text-earth-muted">
+                        <span class="flex items-center">
+                            <i class="fa-solid fa-location-dot text-earth-terracotta mr-1.5"></i>
+                            晨霧與山谷的對話
+                        </span>
+                        <span class="font-serif italic text-earth-sage">Autumn Breeze</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== 3. 篩選與精選日誌區塊 (Journal & Travel Grid) ==================== -->
+    <section id="journal" class="py-16 bg-earth-oat/60 border-y border-earth-border">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- 區塊標題與分類篩選按鈕 -->
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+                <div>
+                    <span class="text-xs font-semibold tracking-widest uppercase text-earth-sage">STORIES & NOTES</span>
+                    <h2 class="font-serif text-3xl font-bold text-earth-brown mt-1">精選日誌與足跡</h2>
+                </div>
+
+                <!-- 分類篩選器 -->
+                <div id="filter-buttons" class="flex flex-wrap gap-2">
+                    <button data-category="全部" class="filter-btn active px-4 py-2 rounded-full text-sm font-medium transition-all bg-earth-terracotta text-white shadow-sm">
+                        全部
+                    </button>
+                    <button data-category="旅遊足跡" class="filter-btn px-4 py-2 rounded-full text-sm font-medium transition-all bg-white text-earth-muted hover:text-earth-brown border border-earth-border">
+                        旅遊足跡
+                    </button>
+                    <button data-category="生活日常" class="filter-btn px-4 py-2 rounded-full text-sm font-medium transition-all bg-white text-earth-muted hover:text-earth-brown border border-earth-border">
+                        生活日常
+                    </button>
+                    <button data-category="戶外探索" class="filter-btn px-4 py-2 rounded-full text-sm font-medium transition-all bg-white text-earth-muted hover:text-earth-brown border border-earth-border">
+                        戶外探索
+                    </button>
+                </div>
+            </div>
+
+            <!-- 文章卡片網格容器 (由 JavaScript 動態渲染，方便管理與新增) -->
+            <div id="posts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+                <!-- 文章卡片將自動載入於此 -->
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ==================== 4. 關於我與足跡統計 (About & Stats) ==================== -->
+    <section id="about" class="py-16 md:py-24 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+        <div class="bg-white rounded-3xl p-6 sm:p-10 lg:p-12 border border-earth-border shadow-sm">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+                
+                <!-- 個人頭像與簡介 -->
+                <div class="lg:col-span-7 space-y-5">
+                    <div class="flex items-center space-x-4">
+                        <img 
+                            src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=400&q=80" 
+                            onerror="this.onerror=null;this.src='https://placehold.co/200x200/A67B5B/FFFFFF?text=Me';" 
+                            alt="站長頭像" 
+                            class="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-earth-terracotta p-0.5"
+                        >
+                        <div>
+                            <span class="text-xs font-medium text-earth-sage tracking-wider uppercase">ABOUT THE AUTHOR</span>
+                            <h2 class="font-serif text-2xl sm:text-3xl font-bold text-earth-brown">關於這個小角落</h2>
+                        </div>
+                    </div>
+
+                    <p class="text-earth-muted leading-relaxed text-base">
+                        你好！歡迎來到我的「生活/旅遊記錄」。我喜歡在週末背起相機走進山林與海邊，也熱愛在平日午後尋找巷弄裡的手沖咖啡館。
+                    </p>
+                    <p class="text-earth-muted leading-relaxed text-base">
+                        成立這個網站的初衷，是希望在步調快速的時代裡，為自己留下一座安靜的數位花園，記錄每一次出發的悸動，以及平凡生活裡的微光時刻。
+                    </p>
+
+                    <!-- 興趣關鍵字標籤 -->
+                    <div class="pt-2 flex flex-wrap gap-2 text-xs text-earth-brown">
+                        <span class="px-3 py-1.5 rounded-lg bg-earth-oat"># 慢步調旅行</span>
+                        <span class="px-3 py-1.5 rounded-lg bg-earth-oat"># 咖啡與閱讀</span>
+                        <span class="px-3 py-1.5 rounded-lg bg-earth-oat"># 底片與風景攝影</span>
+                        <span class="px-3 py-1.5 rounded-lg bg-earth-oat"># 山林步道</span>
+                    </div>
+                </div>
+
+                <!-- 足跡統計數據卡片 -->
+                <div class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-4">
+                    <div class="p-5 rounded-2xl bg-earth-oat/80 border border-earth-border flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-earth-muted font-medium">走訪城市與鄉鎮</p>
+                            <p class="font-serif text-3xl font-bold text-earth-terracotta mt-1">28 <span class="text-sm font-sans font-normal text-earth-muted">個地方</span></p>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-white text-earth-terracotta flex items-center justify-center text-xl shadow-xs">
+                            <i class="fa-solid fa-map-location-dot"></i>
+                        </div>
+                    </div>
+
+                    <div class="p-5 rounded-2xl bg-earth-oat/80 border border-earth-border flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-earth-muted font-medium">累積紀錄篇章</p>
+                            <p id="stat-post-count" class="font-serif text-3xl font-bold text-earth-sage mt-1">6 <span class="text-sm font-sans font-normal text-earth-muted">篇故事</span></p>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-white text-earth-sage flex items-center justify-center text-xl shadow-xs">
+                            <i class="fa-solid fa-book-open"></i>
+                        </div>
+                    </div>
+
+                    <div class="p-5 rounded-2xl bg-earth-oat/80 border border-earth-border flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-earth-muted font-medium">相機收藏瞬間</p>
+                            <p class="font-serif text-3xl font-bold text-earth-brown mt-1">1,420+ <span class="text-sm font-sans font-normal text-earth-muted">張快門</span></p>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-white text-earth-brown flex items-center justify-center text-xl shadow-xs">
+                            <i class="fa-solid fa-camera-retro"></i>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== 5. 頁尾 (Footer) ==================== -->
+    <footer class="bg-earth-oat border-t border-earth-border py-10 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="text-center sm:text-left">
+                <p class="font-serif font-bold text-earth-brown text-lg">生活/旅遊記錄</p>
+                <p class="text-xs text-earth-muted mt-1">© 2026 生活/旅遊記錄. All rights reserved.</p>
+            </div>
+
+            <!-- 社群與聯絡圖示 -->
+            <div class="flex items-center space-x-3">
+                <a href="#about" aria-label="Instagram" class="w-10 h-10 rounded-full bg-white border border-earth-border text-earth-brown hover:bg-earth-terracotta hover:text-white hover:border-earth-terracotta transition-all flex items-center justify-center">
+                    <i class="fa-brands fa-instagram"></i>
+                </a>
+                <a href="#about" aria-label="Threads" class="w-10 h-10 rounded-full bg-white border border-earth-border text-earth-brown hover:bg-earth-terracotta hover:text-white hover:border-earth-terracotta transition-all flex items-center justify-center">
+                    <i class="fa-solid fa-at"></i>
+                </a>
+                <a href="mailto:hello@example.com" aria-label="Email" class="w-10 h-10 rounded-full bg-white border border-earth-border text-earth-brown hover:bg-earth-terracotta hover:text-white hover:border-earth-terracotta transition-all flex items-center justify-center">
+                    <i class="fa-regular fa-envelope"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== 文章閱讀詳細內容彈出視窗 (Article Modal) ==================== -->
+    <div id="article-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 sm:p-6 bg-earth-brown/60 backdrop-blur-xs">
+        <div class="bg-earth-bg border border-earth-border rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative animate-fadeIn">
+            <!-- 關閉按鈕 -->
+            <button onclick="closeArticleModal()" class="sticky top-4 float-right mr-4 mt-4 z-10 w-10 h-10 rounded-full bg-white/90 text-earth-brown hover:bg-earth-terracotta hover:text-white shadow-md flex items-center justify-center transition-colors" aria-label="關閉視窗">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <!-- 視窗內容區 -->
+            <div id="modal-content-body" class="p-6 sm:p-8 pt-2 clear-both">
+                <!-- 動態填入文章詳細內容 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 新增/編輯日誌預覽小工具彈出視窗 (Editor Helper Modal) ==================== -->
+    <div id="editor-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 sm:p-6 bg-earth-brown/60 backdrop-blur-xs">
+        <div class="bg-white border border-earth-border rounded-3xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 sm:p-8">
+            <div class="flex items-center justify-between border-b border-earth-border pb-4 mb-5">
+                <div>
+                    <h3 class="font-serif text-xl font-bold text-earth-brown">新增日誌預覽小工具</h3>
+                    <p class="text-xs text-earth-muted mt-0.5">填寫後可立即預覽卡片效果，並複製程式碼貼回檔案中永久保存</p>
+                </div>
+                <button onclick="closeEditorModal()" class="w-8 h-8 rounded-full bg-earth-oat text-earth-brown hover:bg-earth-terracotta hover:text-white flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="new-post-form" class="space-y-4 text-sm">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-medium text-earth-brown mb-1">文章標題 *</label>
+                        <input type="text" id="input-title" required placeholder="例如：花蓮海邊的慢步調午後" class="w-full px-3.5 py-2 rounded-xl border border-earth-border bg-earth-bg focus:outline-none focus:border-earth-terracotta">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-earth-brown mb-1">分類標籤 *</label>
+                        <select id="input-category" class="w-full px-3.5 py-2 rounded-xl border border-earth-border bg-earth-bg focus:outline-none focus:border-earth-terracotta">
+                            <option value="旅遊足跡">旅遊足跡</option>
+                            <option value="生活日常">生活日常</option>
+                            <option value="戶外探索">戶外探索</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-medium text-earth-brown mb-1">日期 *</label>
+                        <input type="text" id="input-date" required value="2026.11.11" class="w-full px-3.5 py-2 rounded-xl border border-earth-border bg-earth-bg focus:outline-none focus:border-earth-terracotta">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-earth-brown mb-1">地點標記 *</label>
+                        <input type="text" id="input-location" required placeholder="例如：台灣・花蓮七星潭" class="w-full px-3.5 py-2 rounded-xl border border-earth-border bg-earth-bg focus:outline-none focus:border-earth-terracotta">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-earth-brown mb-1">封面圖片網址 (選填，留空將使用預設風景圖)</label>
+                    <input type="url" id="input-image" placeholder="https://images.unsplash.com/..." class="w-full px-3.5 py-2 rounded-xl border border-earth-border bg-earth-bg focus:outline-none focus:border-earth-terracotta">
+                </div>
+
+                <div>
+                    <label class="block font-medium text-earth-brown mb-1">文章完整內容 *</label>
+                    <textarea id="input-content" rows="4" required placeholder="寫下這段旅程或日常的溫暖故事..." class="w-full px-3.5 py-2 rounded-xl border border-earth-border bg-earth-bg focus:outline-none focus:border-earth-terracotta"></textarea>
+                </div>
+
+                <div class="pt-2 flex flex-col sm:flex-row gap-3">
+                    <button type="submit" class="flex-1 py-2.5 px-4 rounded-xl bg-earth-terracotta hover:bg-earth-terracottaDark text-white font-medium transition-colors">
+                        <i class="fa-solid fa-plus mr-1.5"></i>加入頁面即時預覽
+                    </button>
+                    <button type="button" onclick="copyPostCode()" class="py-2.5 px-4 rounded-xl bg-earth-oat hover:bg-earth-border text-earth-brown font-medium transition-colors">
+                        <i class="fa-regular fa-copy mr-1.5"></i>複製程式碼片段
+                    </button>
+                </div>
+            </form>
+
+            <!-- 狀態提示訊息盒 -->
+            <div id="copy-feedback" class="hidden mt-4 p-3 rounded-xl bg-earth-sage/15 text-earth-sage text-xs font-medium text-center">
+                已將文章資料物件複製到剪貼簿！您可以貼在 HTML 檔案中的 `journalPosts` 陣列裡永久保存。
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== JavaScript 邏輯與文章資料庫 ==================== -->
+    <script>
+        /**
+         * 【站長擴充指南】
+         * 日後若要新增或修改文章，只需在下方 `journalPosts` 陣列中，
+         * 複製一組 `{ ... },` 區塊貼上並修改文字與圖片網址即可！
+         */
+        const journalPosts = [
+            {
+                id: 1,
+                title: "京都鴨川旁的晨間散步與手沖咖啡",
+                category: "旅遊足跡",
+                date: "2026.10.18",
+                location: "日本・京都鴨川",
+                image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=900&q=80",
+                summary: "清晨七點的鴨川沒有喧囂，只有微涼的秋風、慢跑的人們，以及轉角老屋裡剛磨好的深焙咖啡香氣。",
+                content: "清晨七點的鴨川沒有白日的喧囂，只有微涼的秋風拂過水面，還有沿著河岸慢跑的人們與成群的水鳥。\n\n走進三條通附近的一間町家咖啡館，木造拉門發出輕微的聲響。點了一杯手沖耶加雪菲與厚切奶油吐司，陽光正好透過格子窗灑在溫潤的木桌上。旅行最迷人的時刻，往往不是趕赴下一個知名景點，而是這樣毫無目的地坐在異鄉的早晨裡，感受時間緩慢流動。"
+            },
+            {
+                id: 2,
+                title: "週末午後的陽台植物修剪與閱讀時光",
+                category: "生活日常",
+                date: "2026.10.05",
+                location: "居家・小陽台",
+                image: "https://images.unsplash.com/photo-1463320726281-d96a807023d0?auto=format&fit=crop&w=900&q=80",
+                summary: "替龜背芋換上新的陶土花盆，泡一壺熱洋甘菊茶，把手機調成靜音，享受屬於自己的安靜週末。",
+                content: "連續忙碌了兩個禮拜，這個週末決定哪裡也不去，好好待在家裡整理陽台上的綠色植物。\n\n替長出新葉的龜背芋換上透氣的赤陶花盆，修剪掉枯黃的葉片，看著泥土吸飽水分後的深褐色澤，心情也跟著沉澱下來。午後泡了一壺熱洋甘菊茶，翻開買了許久卻一直沒讀完的散文集，微風吹動窗簾，這就是生活裡最踏實的幸福。"
+            },
+            {
+                id: 3,
+                title: "合歡山北峰稜線：在雲海之上迎接日出",
+                category: "戶外探索",
+                date: "2026.09.22",
+                location: "台灣・南投合歡山",
+                image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=900&q=80",
+                summary: "凌晨三點摸黑起登，當第一道金橘色光芒穿透厚實雲層時，所有的寒冷與疲憊都在瞬間被治癒。",
+                content: "凌晨三點戴著頭燈從登山口出發，高山的氣溫只有五度，每一步呼吸都能看見白煙。沿著陡峭的碎石坡向上攀升，抬頭便是毫無光害的滿天星斗。\n\n大約五點半抵達稜線反射板附近，東方天際線開始泛起溫暖的橘紅色。當太陽躍出雲海的那一剎那，整片箭竹草坡被染成耀眼的金黃色，壯闊的山巒在腳下綿延，讓人深深感受到大自然的溫柔與力量。"
+            },
+            {
+                id: 4,
+                title: "台南老巷弄裡的碗粿與午後陽光",
+                category: "旅遊足跡",
+                date: "2026.08.30",
+                location: "台灣・台南中西區",
+                image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=900&q=80",
+                summary: "紅磚牆、九重葛與斑駁的木窗框，走進府城狹窄的紅磚巷弄，每一個轉角都藏著歲月的故事。",
+                content: "每次來到台南，總喜歡把車停在城區外圍，用雙腳鑽進那些連機車都難以會車的小巷弄裡。\n\n紅磚老牆上攀爬著盛開的九重葛，午後斜射的陽光在石板路上拉出長長的影子。在市場邊吃了一碗剛出爐、淋上濃郁蒜蓉醬油的古早味碗粿，再散步到附近的獨立書店吹冷氣翻書，府城的步調總是能讓人自然而然地慢下來。"
+            },
+            {
+                id: 5,
+                title: "雨夜裡的廚房實驗：慢燉紅酒牛肉與酸種麵包",
+                category: "生活日常",
+                date: "2026.08.14",
+                location: "居家・餐桌日常",
+                image: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80",
+                summary: "窗外下著夏末的雷陣雨，廚房裡鑄鐵鍋正咕嘟咕嘟地冒著熱氣，整間屋子都充滿了迷迭香與紅酒的暖意。",
+                content: "傍晚突然下起滂沱大雨，取消了原本的外出計畫，轉身走進廚房打開冰箱，決定來燉一鍋紅酒牛肉。\n\n將牛肋條煎至表面金黃焦香，加入洋蔥、紅蘿蔔、新鮮迷迭香與半瓶紅酒，蓋上鑄鐵鍋蓋小火慢燉兩個小時。等待的時間裡，整間屋子瀰漫著溫暖醇厚的香氣。搭配烤得外脆內軟的酸種麵包沾著濃郁醬汁，雨夜也變得格外浪漫。"
+            },
+            {
+                id: 6,
+                title: "東海岸台11線：聽太平洋的海浪拍打礫石灘",
+                category: "戶外探索",
+                date: "2026.07.19",
+                location: "台灣・台東長濱",
+                image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80",
+                summary: "沿著海岸公路一路向南，左側是深邃的太平洋藍，右側是翠綠的海岸山脈，風裡帶著淡淡的鹹味。",
+                content: "沿著台11線一路向南行駛，車窗搖下一半，海風帶著夏天的溫度與淡淡的鹹味吹進車內。\n\n在長濱的一處無名海灘停下腳步，脫掉鞋子踩在被太陽曬得暖烘烘的礫石上。太平洋的浪花一波波湧上岸邊，退去時帶動圓潤的石頭發出清脆的滾動聲。坐在漂流木上看著海平面發呆了一整個下午，所有的煩惱彷彿都被海浪帶走了。"
+            }
+        ];
+
+        let currentCategory = '全部';
+
+        // 渲染文章卡片列表
+        function renderPosts(category = '全部') {
+            currentCategory = category;
+            const grid = document.getElementById('posts-grid');
+            const filtered = category === '全部' 
+                ? journalPosts 
+                : journalPosts.filter(post => post.category === category);
+
+            // 更新統計區塊的文章總數
+            const statCount = document.getElementById('stat-post-count');
+            if (statCount) {
+                statCount.innerHTML = `${journalPosts.length} <span class="text-sm font-sans font-normal text-earth-muted">篇故事</span>`;
+            }
+
+            grid.innerHTML = filtered.map(post => `
+                <article onclick="openArticleModal(${post.id})" class="group cursor-pointer bg-white rounded-2xl overflow-hidden border border-earth-border shadow-xs hover:shadow-md transition-all duration-300 flex flex-col">
+                    <!-- 卡片圖片 -->
+                    <div class="relative overflow-hidden aspect-[16/10] bg-earth-oat">
+                        <img 
+                            src="${post.image}" 
+                            onerror="this.onerror=null;this.src='https://placehold.co/600x400/F3EDE4/A67B5B?text=Travel+Journal';" 
+                            alt="${post.title}" 
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        >
+                        <span class="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-medium bg-white/95 text-earth-terracotta shadow-xs">
+                            ${post.category}
+                        </span>
+                    </div>
+
+                    <!-- 卡片內文 -->
+                    <div class="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between text-xs text-earth-muted mb-2.5">
+                                <span><i class="fa-regular fa-calendar mr-1"></i>${post.date}</span>
+                                <span><i class="fa-solid fa-location-dot text-earth-sage mr-1"></i>${post.location}</span>
+                            </div>
+                            <h3 class="font-serif text-xl font-bold text-earth-brown group-hover:text-earth-terracotta transition-colors line-clamp-2 mb-2.5">
+                                ${post.title}
+                            </h3>
+                            <p class="text-sm text-earth-muted leading-relaxed line-clamp-3">
+                                ${post.summary}
+                            </p>
+                        </div>
+
+                        <div class="mt-5 pt-4 border-t border-earth-oat flex items-center justify-between text-xs font-medium text-earth-terracotta">
+                            <span>閱讀完整記錄</span>
+                            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+
+            updateFilterButtonsUI(category);
+        }
+
+        // 更新分類按鈕的選中樣式
+        function updateFilterButtonsUI(activeCategory) {
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => {
+                if (btn.dataset.category === activeCategory) {
+                    btn.className = 'filter-btn active px-4 py-2 rounded-full text-sm font-medium transition-all bg-earth-terracotta text-white shadow-sm';
+                } else {
+                    btn.className = 'filter-btn px-4 py-2 rounded-full text-sm font-medium transition-all bg-white text-earth-muted hover:text-earth-brown border border-earth-border';
+                }
+            });
+        }
+
+        // 篩選文章功能
+        function filterPosts(category) {
+            renderPosts(category);
+        }
+
+        // 綁定篩選按鈕點擊事件
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterPosts(btn.dataset.category);
+            });
+        });
+
+        // 開啟文章閱讀彈出視窗
+        function openArticleModal(id) {
+            const post = journalPosts.find(p => p.id === id);
+            if (!post) return;
+
+            const modal = document.getElementById('article-modal');
+            const body = document.getElementById('modal-content-body');
+
+            // 將換行符號轉換為段落
+            const formattedParagraphs = post.content.split('\n\n').map(p => 
+                `<p class="mb-4 leading-relaxed text-earth-brown/90 text-base">${p}</p>`
+            ).join('');
+
+            body.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex flex-wrap items-center gap-3 text-xs text-earth-muted">
+                        <span class="px-3 py-1 rounded-full bg-earth-oat text-earth-terracotta font-semibold">${post.category}</span>
+                        <span><i class="fa-regular fa-calendar mr-1"></i>${post.date}</span>
+                        <span><i class="fa-solid fa-location-dot text-earth-sage mr-1"></i>${post.location}</span>
+                    </div>
+
+                    <h2 class="font-serif text-2xl sm:text-3xl font-bold text-earth-brown leading-snug">
+                        ${post.title}
+                    </h2>
+
+                    <div class="rounded-2xl overflow-hidden aspect-[16/9] bg-earth-oat my-4 border border-earth-border">
+                        <img 
+                            src="${post.image}" 
+                            onerror="this.onerror=null;this.src='https://placehold.co/800x450/F3EDE4/A67B5B?text=Story+Image';" 
+                            alt="${post.title}" 
+                            class="w-full h-full object-cover"
+                        >
+                    </div>
+
+                    <div class="pt-2 border-t border-earth-border">
+                        ${formattedParagraphs}
+                    </div>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden'; // 防止背景滾動
+        }
+
+        // 關閉文章彈出視窗
+        function closeArticleModal() {
+            const modal = document.getElementById('article-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = '';
+        }
+
+        // 點擊視窗外部遮罩關閉
+        document.getElementById('article-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'article-modal') closeArticleModal();
+        });
+
+        // 手機版導覽選單切換
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        document.querySelectorAll('.mobile-link').forEach(link => {
+            link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+        });
+
+        // ==================== 新增日誌預覽小工具邏輯 ====================
+        function openEditorModal() {
+            mobileMenu.classList.add('hidden');
+            document.getElementById('copy-feedback').classList.add('hidden');
+            const modal = document.getElementById('editor-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeEditorModal() {
+            const modal = document.getElementById('editor-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        document.getElementById('editor-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'editor-modal') closeEditorModal();
+        });
+
+        // 取得表單建立的新文章物件
+        function buildPostFromForm() {
+            const title = document.getElementById('input-title').value.trim();
+            const category = document.getElementById('input-category').value;
+            const date = document.getElementById('input-date').value.trim();
+            const location = document.getElementById('input-location').value.trim();
+            const imageInput = document.getElementById('input-image').value.trim();
+            const content = document.getElementById('input-content').value.trim();
+
+            return {
+                id: Date.now(),
+                title: title || "未命名日誌",
+                category: category,
+                date: date || "2026.11.11",
+                location: location || "某個溫暖角落",
+                image: imageInput || "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=900&q=80",
+                summary: content.slice(0, 65) + (content.length > 65 ? "..." : ""),
+                content: content
+            };
+        }
+
+        // 表單送出：即時加入網頁預覽
+        document.getElementById('new-post-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newPost = buildPostFromForm();
+            journalPosts.unshift(newPost); // 加到最前面
+            renderPosts('全部');
+            closeEditorModal();
+            document.getElementById('new-post-form').reset();
+            // 平滑滾動到日誌區塊查看結果
+            document.getElementById('journal').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // 複製新文章的程式碼片段（方便站長貼回 HTML 檔案）
+        function copyPostCode() {
+            const newPost = buildPostFromForm();
+            const codeSnippet = JSON.stringify(newPost, null, 4) + ",";
+            
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.value = codeSnippet;
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextarea);
+
+            const feedback = document.getElementById('copy-feedback');
+            feedback.classList.remove('hidden');
+        }
+
+        // 初始化頁面
+        window.addEventListener('DOMContentLoaded', () => {
+            renderPosts('全部');
+        });
+    </script>
+</body>
+</html>
